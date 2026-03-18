@@ -1,3 +1,6 @@
+[directory]
+style = "fg:#c07070"
+
 [line_break]
 disabled = false
 
