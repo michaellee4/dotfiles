@@ -1,5 +1,5 @@
 pollMillis=20
-delay=25
+delay=50
 requireMouseStop=false
 ignoreSpaceChanged=false
 disableKey="control"
