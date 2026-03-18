@@ -1,0 +1,6 @@
+pollMillis=20
+delay=0
+requireMouseStop=false
+ignoreSpaceChanged=false
+disableKey="control"
+mouseDelta=0.0

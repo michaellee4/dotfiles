@@ -1,0 +1,14 @@
+[[mgr.prepend_keymap]]
+on   = "<Esc>"
+run  = "quit"
+desc = "Exit yazi"
+
+[[mgr.prepend_keymap]]
+on   = "C"
+run  = "shell -- code %h"
+desc = "Open in VSCode"
+
+[[mgr.prepend_keymap]]
+on   = "F"
+run  = "plugin fzf"
+desc = "Fuzzy find"

@@ -1,0 +1,11 @@
+[line_break]
+disabled = false
+
+[character]
+success_symbol = "[❯](yellow)"
+
+[time]
+disabled = false
+format = "[$time]($style) "
+time_format = "%H:%M:%S"
+style = "cyan"
