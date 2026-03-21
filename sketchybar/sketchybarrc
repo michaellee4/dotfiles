@@ -12,7 +12,7 @@ PLUGIN_DIR="$CONFIG_DIR/plugins"
 # If you are looking for other colors, see the color picker:
 # https://felixkratz.github.io/SketchyBar/config/tricks#color-picker
 
-sketchybar --bar position=top height=32 blur_radius=30 color=0x40000000
+sketchybar --bar position=bottom height=32 blur_radius=0 color=0xff24273a topmost=on corner_radius=10
 
 ##### Changing Defaults #####
 # We now change some default values, which are applied to all further items.
@@ -33,28 +33,28 @@ default=(
 )
 sketchybar --default "${default[@]}"
 
-##### Adding Mission Control Space Indicators #####
-# Let's add some mission control spaces:
-# https://felixkratz.github.io/SketchyBar/config/components#space----associate-mission-control-spaces-with-an-item
-# to indicate active and available mission control spaces.
+##### Adding Aerospace Workspace Indicators #####
+sketchybar --add event aerospace_workspace_change
 
-SPACE_ICONS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
-for i in "${!SPACE_ICONS[@]}"
-do
-  sid="$(($i+1))"
-  space=(
-    space="$sid"
-    icon="${SPACE_ICONS[i]}"
-    icon.padding_left=7
-    icon.padding_right=7
-    background.color=0x40ffffff
-    background.corner_radius=5
-    background.height=25
-    label.drawing=off
-    script="$PLUGIN_DIR/space.sh"
-    click_script="yabai -m space --focus $sid"
-  )
-  sketchybar --add space space."$sid" left --set space."$sid" "${space[@]}"
+for sid in 1 2 3 4 5 6 7 8 9 10; do
+  AERO_MONITOR=$(aerospace list-workspaces --all --format '%{workspace} %{monitor-id}' | awk -v ws="$sid" '$1 == ws {print $2}')
+  AERO_MONITOR=${AERO_MONITOR:-1}
+  MONITOR=$(aerospace list-monitors --format '%{monitor-id} %{monitor-name}' | awk -v mid="$AERO_MONITOR" '$1 == mid {print $0}' | sed 's/.*(\([0-9]*\))/\1/')
+  MONITOR=${MONITOR:-1}
+  sketchybar --add item space.$sid left \
+             --subscribe space.$sid aerospace_workspace_change \
+             --set space.$sid \
+               display=$MONITOR \
+               icon="$sid" \
+               icon.padding_left=7 \
+               icon.padding_right=7 \
+               background.color=0x40ffffff \
+               background.corner_radius=5 \
+               background.height=25 \
+               label.drawing=off \
+               drawing=off \
+               click_script="aerospace workspace $sid" \
+               script="$PLUGIN_DIR/space.sh $sid"
 done
 
 ##### Adding Left Items #####

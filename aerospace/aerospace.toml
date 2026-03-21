@@ -15,6 +15,9 @@ enable-normalization-opposite-orientation-for-nested-containers = false
 # Mouse follows focus when focused monitor changes
 # on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
+# Notify sketchybar on workspace change
+exec-on-workspace-change = ['/bin/bash', '-c', 'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE']
+
 # Float apps that don't tile well
 [[on-window-detected]]
 if.app-id = 'com.apple.systempreferences'
@@ -117,7 +120,7 @@ run = 'layout floating'
 [gaps]
     outer.top = 5
     outer.left = 8
-    outer.bottom = 8
+    outer.bottom = 40
     outer.right = 8
     inner.horizontal = 8
     inner.vertical = 6
