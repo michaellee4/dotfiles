@@ -35,6 +35,9 @@ alias ls='ls -G'
 # Quick reload
 alias src='source ~/.zshrc'
 
+# raspberrypi
+alias pi='ssh milee@pilee'
+
 # Yazi wrapper - cd to last directory on exit
 function y() {
     local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
