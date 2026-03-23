@@ -35,7 +35,7 @@ alias ls='ls -G'
 alias src='source ~/.zshrc'
 
 # raspberrypi
-alias pi='ssh milee@pilee'
+alias pi='kitty +kitten ssh milee@pilee'
 
 # Yazi wrapper - cd to last directory on exit
 function y() {
