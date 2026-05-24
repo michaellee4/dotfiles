@@ -585,6 +585,20 @@ before packages are loaded."
   (global-visual-line-mode -1)
   (setq select-enable-clipboard t
         save-interprogram-paste-before-kill t)
+  (when (and (eq system-type 'darwin)
+             (executable-find "pbcopy")
+             (executable-find "pbpaste"))
+    (setq interprogram-cut-function
+          (lambda (text &optional _push)
+            (let ((process-connection-type nil))
+              (let ((proc (start-process "pbcopy" nil "pbcopy")))
+                (process-send-string proc text)
+                (process-send-eof proc))))
+          interprogram-paste-function
+          (lambda ()
+            (let ((text (shell-command-to-string "pbpaste")))
+              (unless (string-empty-p text)
+                text)))))
 
   (with-eval-after-load 'evil
     (defun ml/regular-buffer-p (buffer)
