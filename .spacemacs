@@ -600,6 +600,90 @@ before packages are loaded."
               (unless (string-empty-p text)
                 text)))))
 
+  (defvar ml/spacemacs-agent-dotfiles-dir "/Users/michaellee/dotfiles")
+
+  (defvar ml/spacemacs-agent-prompt-template
+    "You are a Codex subagent editing Michael Lee's dotfiles.
+
+Task from Michael:
+
+%s
+
+Repository and file facts:
+- Work in /Users/michaellee/dotfiles.
+- The real Spacemacs config is /Users/michaellee/dotfiles/.spacemacs.
+- /Users/michaellee/.spacemacs is hard-linked to that file.
+
+Workflow:
+1. Inspect git status before editing. Do not overwrite unrelated user changes.
+2. Make the requested .spacemacs change in the smallest reasonable way.
+3. Keep user code above the auto-generated custom settings comment.
+4. Validate the config at minimum with:
+   emacs --batch --eval \"(with-temp-buffer (insert-file-contents \\\"/Users/michaellee/dotfiles/.spacemacs\\\") (condition-case err (while t (read (current-buffer))) (end-of-file (message \\\"read ok\\\")) (error (message \\\"read error at %%s: %%S\\\" (point) err) (kill-emacs 1))))\"
+5. When appropriate, also run a Spacemacs batch startup validation:
+   emacs --batch --load /Users/michaellee/.emacs.d/init.el --eval \"(message \\\"spacemacs batch load ok\\\")\"
+6. Review git diff.
+7. Commit only the relevant dotfiles changes with a concise message.
+8. Push the commit.
+9. Report what changed, what validation ran, and the pushed commit hash.")
+
+  (defvar ml/spacemacs-agent-request-buffer "*Spacemacs Agent Request*")
+  (defvar ml/spacemacs-agent-output-buffer "*Spacemacs Agent*")
+
+  (defvar ml/spacemacs-agent-request-mode-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map (kbd "C-c C-c") #'ml/spacemacs-agent-submit)
+      map))
+
+  (define-derived-mode ml/spacemacs-agent-request-mode text-mode "Spacemacs-Agent"
+    "Mode for writing a Spacemacs change request for Codex."
+    (setq-local header-line-format "Describe the Spacemacs change, then press C-c C-c to submit."))
+
+  (defun ml/spacemacs-agent-request ()
+    "Open a buffer for requesting an automated Spacemacs config change."
+    (interactive)
+    (let ((buffer (get-buffer-create ml/spacemacs-agent-request-buffer)))
+      (pop-to-buffer buffer)
+      (ml/spacemacs-agent-request-mode)
+      (when (= (point-min) (point-max))
+        (insert ""))
+      (goto-char (point-max))))
+
+  (defun ml/spacemacs-agent-submit ()
+    "Run Codex on the current Spacemacs change request."
+    (interactive)
+    (unless (derived-mode-p 'ml/spacemacs-agent-request-mode)
+      (user-error "This command must be run from a Spacemacs agent request buffer"))
+    (let* ((request (string-trim (buffer-substring-no-properties (point-min) (point-max))))
+           (prompt (format ml/spacemacs-agent-prompt-template request))
+           (output-buffer (get-buffer-create ml/spacemacs-agent-output-buffer)))
+      (when (string-empty-p request)
+        (user-error "Request is empty"))
+      (when (get-buffer-process output-buffer)
+        (user-error "A Spacemacs agent process is already running"))
+      (with-current-buffer output-buffer
+        (read-only-mode -1)
+        (erase-buffer)
+        (insert "Running Codex for Spacemacs change...\n\n")
+        (read-only-mode 1))
+      (display-buffer output-buffer)
+      (make-process
+       :name "spacemacs-agent"
+       :buffer output-buffer
+       :command (list "codex" "exec"
+                      "-C" ml/spacemacs-agent-dotfiles-dir
+                      "--sandbox" "danger-full-access"
+                      "-a" "never"
+                      prompt)
+       :sentinel
+       (lambda (process event)
+         (when (memq (process-status process) '(exit signal))
+           (with-current-buffer (process-buffer process)
+             (read-only-mode -1)
+             (goto-char (point-max))
+             (insert (format "\nCodex process %s" event))
+             (read-only-mode 1)))))))
+
   (with-eval-after-load 'evil
     (defun ml/regular-buffer-p (buffer)
       "Return non-nil when BUFFER is a normal user-facing buffer."
