@@ -43,7 +43,9 @@ This function should only modify configuration layer settings."
      emacs-lisp
      git
      helm
-     python
+     (python :variables
+             python-backend 'lsp
+             python-lsp-server 'pyright)
      lsp
      ;; markdown
      multiple-cursors
@@ -233,7 +235,7 @@ It should only modify the values of Spacemacs settings."
    ;; Point size is recommended, because it's device independent. (default 10.0)
    dotspacemacs-default-font '("Source Code Pro"
                                :size 10.0
-                               :weight normal
+                               :weight light
                                :width normal)
 
    ;; Default icons font, it can be `all-the-icons' or `nerd-icons'.
@@ -581,6 +583,8 @@ Put your configuration code here, except for variables that should be set
 before packages are loaded."
   (setq-default truncate-lines t)
   (global-visual-line-mode -1)
+  (setq select-enable-clipboard t
+        save-interprogram-paste-before-kill t)
 
   (with-eval-after-load 'evil
     (defun ml/regular-buffer-p (buffer)
@@ -657,7 +661,7 @@ This function is called at the very end of Spacemacs initialization."
          highlight-indentation highlight-numbers highlight-parentheses hl-todo
          holy-mode hungry-delete hybrid-mode indent-guide info+ inspector
          link-hint live-py-mode llama load-env-vars lorem-ipsum lsp-mode
-         lsp-origami lsp-treemacs lsp-ui macrostep magit magit-section
+         lsp-origami lsp-pyright lsp-treemacs lsp-ui macrostep magit magit-section
          markdown-mode multi-line nameless open-junk-file org org-superstar
          origami overseer package-lint page-break-lines paradox password-generator
          pcre2el pip-requirements pipenv pippel poetry popwin pos-tip py-isort
