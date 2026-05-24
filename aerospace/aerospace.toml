@@ -18,31 +18,6 @@ enable-normalization-opposite-orientation-for-nested-containers = false
 # Notify sketchybar on workspace change
 exec-on-workspace-change = ['/bin/bash', '-c', 'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE']
 
-# Float apps that don't tile well
-[[on-window-detected]]
-if.app-id = 'com.apple.systempreferences'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.finder'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.calculator'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.ActivityMonitor'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.keychainaccess'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-id = 'com.1password.1password'
-run = 'layout floating'
-
 [mode.main.binding]
     alt-enter = 'exec-and-forget /Applications/kitty.app/Contents/MacOS/kitty --single-instance'
 
@@ -116,6 +91,18 @@ run = 'layout floating'
     l = 'resize width +50'
     enter = 'mode main'
     esc = 'mode main'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Finder'
+run = 'move-node-to-workspace S'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'System Settings'
+run = 'move-node-to-workspace S'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '1Password'
+run = 'move-node-to-workspace S'
 
 [gaps]
     outer.top = 5
